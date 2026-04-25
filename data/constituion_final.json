@@ -80,12 +80,12 @@
     "id": "article_7",
     "article": "7",
     "title": "Rights of citizenship of certain migrants to Pakistan",
-    "description": "Notwithstanding anything in articles 5 and 6, a person who has after the first day of March, 1947, migrated from the territory of India to the territory now included in Pakistan shall not be deemed to be a citizen of India:\n\n \n\nProvided that nothing in this article shall apply to a person who, after having so migrated to the territory now included in Pakistan, has returned to the territory of India under a permit for resettlement or permanent return issued by or under the authority of any law and every such person shall for the purposes of clause (b) of article 6 be deemed to have migrated to the territory of India after the nineteenth day of July, 1948.",
+    "description": "[REPEALED] This article on rights of citizenship for migrants to Pakistan was repealed by the Citizenship (Amendment) Act. It is no longer in force.\n\nOriginal text (historical reference only): Notwithstanding anything in articles 5 and 6, a person who has after the first day of March, 1947, migrated from the territory of India to the territory now included in Pakistan shall not be deemed to be a citizen of India:\n\n \n\nProvided that nothing in this article shall apply to a person who, after having so migrated to the territory now included in Pakistan, has returned to the territory of India under a permit for resettlement or permanent return issued by or under the authority of any law and every such person shall for the purposes of clause (b) of article 6 be deemed to have migrated to the territory of India after the nineteenth day of July, 1948.",
     "part": "II",
     "part_name": "Citizenship",
     "topic": "Citizenship",
     "type": "article",
-    "status": "Repealed by Constitution (Citizenship Amendment) Act"
+    "status": "Repealed — Citizenship (Amendment) Act"
   },
   {
     "id": "article_8",
@@ -355,12 +355,12 @@
     "id": "article_31",
     "article": "31",
     "title": "Compulsory acquisition of property",
-    "description": "[Compulsory acquisition of property.] Rep. by the Constitution (Forty-fourth Amendment) Act, 1978, s. 6 (w.e.f. 20-6-1979).",
+    "description": "[REPEALED] This article (Right to Property as a Fundamental Right) was repealed by the Constitution (44th Amendment) Act, 1978. The right to property is NO LONGER a Fundamental Right. It now exists only as a constitutional right under Article 300A: 'No person shall be deprived of his property save by authority of law.' Article 300A provides much weaker protection than the original Article 31.\n\nOriginal text (historical reference only): [Compulsory acquisition of property.] Rep. by the Constitution (Forty-fourth Amendment) Act, 1978, s. 6 (w.e.f. 20-6-1979).",
     "part": "III",
     "part_name": "Fundamental Rights",
     "topic": "Right to Property (Repealed)",
     "type": "article",
-    "status": "Repealed by Constitution (44th Amendment) Act, 1978"
+    "status": "Repealed — 44th Amendment Act, 1978. Replaced by Article 300A."
   },
   {
     "id": "article_31A",
@@ -396,15 +396,7 @@
     "status": "active"
   },
   {
-    "id": "article_31D",
-    "article": "31D",
-    "title": "Saving of laws in respect of anti-national activities",
-    "description": "[Saving of laws in respect of anti-national activities.] Rep. by the Constitution (Forty-third Amendment) Act, 1977, s. 2 (w.e.f. 13-4-1978).",
-    "part": "III",
-    "part_name": "Fundamental Rights",
-    "topic": "Saving of Certain Laws",
-    "type": "article",
-    "status": "Omitted by Constitution (43rd Amendment) Act, 1977"
+    "id": "article_31D", "article": "31D", "title": "Saving of laws in respect of anti-national activities", "description": "[OMITTED] This article was omitted by the Constitution (43rd Amendment) Act, 1977. It was originally inserted by the 42nd Amendment during the Emergency and allowed Parliament to curtail anti-national activities. It was removed when Emergency-era amendments were rolled back.\n\nOriginal text (historical reference only): [Saving of laws in respect of anti-national activities.] Rep. by the Constitution (Forty-third Amendment) Act, 1977, s. 2 (w.e.f. 13-4-1978).", "part": "III", "part_name": "Fundamental Rights", "topic": "Saving of Certain Laws", "type": "article", "status": "Omitted — 43rd Amendment Act, 1977"
   },
   {
     "id": "article_32",
@@ -421,12 +413,12 @@
     "id": "article_32A",
     "article": "32A",
     "title": "Constitutional validity of State laws not to be considered in proceedings under article 32",
-    "description": "[Constitutional validity of State laws not to be considered in proceedings under article 32.] Rep. by the Constitution (Forty-third Amendment) Act, 1977, s. 3 (w.e.f. 13-4-1978).",
+    "description": "[OMITTED] This article was omitted by the Constitution (43rd Amendment) Act, 1977. It was originally inserted by the 42nd Amendment during the Emergency and barred High Courts from considering the constitutional validity of state laws. It was removed when Emergency-era amendments were rolled back.\n\nOriginal text (historical reference only): [Constitutional validity of State laws not to be considered in proceedings under article 32.] Rep. by the Constitution (Forty-third Amendment) Act, 1977, s. 3 (w.e.f. 13-4-1978).",
     "part": "III",
     "part_name": "Fundamental Rights",
     "topic": "Right to Constitutional Remedies",
     "type": "article",
-    "status": "Omitted by Constitution (43rd Amendment) Act, 1977"
+    "status": "Omitted — 43rd Amendment Act, 1977"
   },
   {
     "id": "article_33",
@@ -685,7 +677,7 @@
     "id": "article_52",
     "article": "52",
     "title": "The President of India",
-    "description": "There shall be a President of India.",
+    "description": "Article 52 of the Constitution of India — The President of India. This article falls under Part V (The Union). Topic: The President and Vice-President. \nFull text: There shall be a President of India.",
     "part": "V",
     "part_name": "The Union",
     "topic": "The President and Vice-President",
@@ -806,7 +798,7 @@
     "id": "article_63",
     "article": "63",
     "title": "The Vice-President of India",
-    "description": "There shall be a Vice-President of India.",
+    "description": "Article 63 of the Constitution of India — The Vice-President of India. This article falls under Part V (The Union). Topic: The President and Vice-President. \nFull text: There shall be a Vice-President of India.",
     "part": "V",
     "part_name": "The Union",
     "topic": "The President and Vice-President",
@@ -1683,15 +1675,7 @@
     "status": "active"
   },
   {
-    "id": "article_141",
-    "article": "141",
-    "title": "Law declared by Supreme Court to be binding on all courts",
-    "description": "The law declared by the Supreme Court shall be binding on all courts within the territory of India.",
-    "part": "V",
-    "part_name": "The Union",
-    "topic": "The Supreme Court",
-    "type": "article",
-    "status": "active"
+    "id": "article_141", "article": "141", "title": "Law declared by Supreme Court to be binding on all courts", "description": "Article 141 of the Constitution of India — Law declared by Supreme Court to be binding on all courts. This article falls under Part V (The Union). Topic: The Supreme Court. \nFull text: The law declared by the Supreme Court shall be binding on all courts within the territory of India.", "part": "V", "part_name": "The Union", "topic": "The Supreme Court", "type": "article", "status": "active"
   },
   {
     "id": "article_142",
@@ -1840,7 +1824,7 @@
     "id": "article_155",
     "article": "155",
     "title": "Appointment of Governor",
-    "description": "The Governor of a State shall be appointed by the President by warrant under his hand and seal.",
+    "description": "Article 155 of the Constitution of India — Appointment of Governor. This article falls under Part VI (The States). \nFull text: The Governor of a State shall be appointed by the President by warrant under his hand and seal.",
     "part": "VI",
     "part_name": "The States",
     "topic": "The States",
@@ -2489,7 +2473,7 @@
     "id": "article_214",
     "article": "214",
     "title": "High Courts for States",
-    "description": "There shall be a High Court for each State.",
+    "description": "Article 214 of the Constitution of India — High Courts for States. This article falls under Part VI (The States). \nFull text: There shall be a High Court for each State.",
     "part": "VI",
     "part_name": "The States",
     "topic": "The States",
@@ -2764,12 +2748,12 @@
     "id": "article_238",
     "article": "238",
     "title": "Application of provisions of Part VI to States in Part B of the First Schedule",
-    "description": "Omitted by the Constitution (Seventh Amendment) Act, 1956, s. 29and Sch. (w.e.f. 1-11-1956).",
+    "description": "[OMITTED] This article was omitted by the Constitution (7th Amendment) Act, 1956, w.e.f. 1-11-1956. It dealt with the application of Part VI provisions to Part B states, a category that was abolished by the 7th Amendment which reorganized states on linguistic lines.\n\nOriginal text (historical reference only): Omitted by the Constitution (Seventh Amendment) Act, 1956, s. 29and Sch. (w.e.f. 1-11-1956).",
     "part": "VII",
     "part_name": "States in Part B of the First Schedule (Repealed)",
     "topic": "States in Part B of the First Schedule (Repealed)",
     "type": "article",
-    "status": "Omitted by Constitution (7th Amendment) Act, 1956"
+    "status": "Omitted — 7th Amendment Act, 1956"
   },
   {
     "id": "article_239",
@@ -3611,7 +3595,7 @@
     "id": "article_264",
     "article": "264",
     "title": "Interpretation",
-    "description": "In this Part, \"Finance Commission\" means a Finance Commission constituted under article 280.",
+    "description": "Article 264 of the Constitution of India — Interpretation. This article falls under Part XII (Finance, Property, Contracts and Suits). \nFull text: In this Part, \"Finance Commission\" means a Finance Commission constituted under article 280.",
     "part": "XII",
     "part_name": "Finance, Property, Contracts and Suits",
     "topic": "Finance, Property, Contracts and Suits",
@@ -3622,7 +3606,7 @@
     "id": "article_265",
     "article": "265",
     "title": "Taxes not to be imposed save by authority of law",
-    "description": "No tax shall be levied or collected except by authority of law.",
+    "description": "Article 265 of the Constitution of India — Taxes not to be imposed save by authority of law. This article falls under Part XII (Finance, Property, Contracts and Suits). \nFull text: No tax shall be levied or collected except by authority of law.",
     "part": "XII",
     "part_name": "Finance, Property, Contracts and Suits",
     "topic": "Finance, Property, Contracts and Suits",
@@ -4018,7 +4002,7 @@
     "id": "article_300A",
     "article": "300A",
     "title": "Persons not to be deprived of property save by authority of law",
-    "description": "No person shall be deprived of his property save by authority of law.",
+    "description": "Article 300A of the Constitution of India — Persons not to be deprived of property save by authority of law. This article falls under Part XII (Finance, Property, Contracts and Suits). \nFull text: No person shall be deprived of his property save by authority of law.",
     "part": "XII",
     "part_name": "Finance, Property, Contracts and Suits",
     "topic": "Finance, Property, Contracts and Suits",
@@ -4843,12 +4827,12 @@
     "id": "article_370",
     "article": "370",
     "title": "Temporary provisions with respect to the State of Jammu and Kashmir",
-    "description": "(1) Notwithstanding anything in this Constitution, —\n\n \n\n(a) the provisions of article 238 shall not apply in relation to the State of Jammu and Kashmir;\n\n \n\n(b) the power of Parliament to make laws for the said State shall be limited to —\n\n \n\n(i) those matters in the Union List and the Concurrent List which, in consultation with the Government of the State, are declared by the President to correspond to matters specified in the Instrument of Accession governing the accession of the State to the Dominion of India as the matters with respect to which the Dominion Legislature may make laws for that State; and\n\n \n\n(ii) such other matters in the said Lists as, with the concurrence of the Government of the State, the President may by order specify.\n\n \n\nExplanation. — For the purposes of this article, the Government of the State means the person for the time being recognised by the President as the Maharaja of Jammu and Kashmir acting on the advice of the Council of Ministers for the time being in office under the Maharaja's Proclamation dated the fifth day of March, 1948;\n\n \n\n(c) the provisions of article 1 and of this article shall apply in relation to that State;\n\n \n\n(d) such of the other provisions of this Constitution shall apply in relation to that State subject to such exceptions and modifications as the President may by order1 specify:\n\n \n\n Provided that no such order which relates to the matters specified in the Instrument of Accession of the State referred to in paragraph (i) of sub-clause (b) shall be issued except in consultation with the Government of the State:\n\n \n\n Provided further that no such order which relates to matters other than those referred to in the last preceding proviso shall be issued except with the concurrence of that Government.\n\n \n\n(2) If the concurrence of the Government of the State referred to in paragraph (ii) of sub-clause (b) of clause (1) or in the second proviso to sub-clause (d) of that clause be given before the Constituent Assembly for the purpose of framing the Constitution of the State is convened, it shall be placed before such Assembly for such decision as it may take thereon.\n\n \n\n(3) Notwithstanding anything in the foregoing provisions of this article, the President may, by public notification, declare that this article shall cease to be operative or shall be operative only with such exceptions and modifications and from such date as he may specify:\n\n \n\n Provided that the recommendation of the Constituent Assembly of the State referred to in clause (2) shall be necessary before the President issues such a notification.",
+    "description": "[ABROGATED] Article 370 was effectively abrogated on 5 August 2019 through a Presidential Order (C.O. 272) issued under Article 370(1) itself, which applied all provisions of the Indian Constitution to Jammu and Kashmir. Simultaneously, the Jammu and Kashmir Reorganisation Act, 2019 was passed by Parliament, bifurcating the state into two Union Territories: Jammu & Kashmir (with a legislature) and Ladakh (without a legislature). The Supreme Court of India upheld the abrogation as constitutionally valid in its landmark judgment in 'In Re: Article 370 of the Constitution' on 11 December 2023, ruling that Article 370 was always a temporary provision and the President had the power to abrogate it.\n\nThe text below reflects the article as it existed before abrogation (for historical reference):\n\n(1) Notwithstanding anything in this Constitution, —\n\n \n\n(a) the provisions of article 238 shall not apply in relation to the State of Jammu and Kashmir;\n\n \n\n(b) the power of Parliament to make laws for the said State shall be limited to —\n\n \n\n(i) those matters in the Union List and the Concurrent List which, in consultation with the Government of the State, are declared by the President to correspond to matters specified in the Instrument of Accession governing the accession of the State to the Dominion of India as the matters with respect to which the Dominion Legislature may make laws for that State; and\n\n \n\n(ii) such other matters in the said Lists as, with the concurrence of the Government of the State, the President may by order specify.\n\n \n\nExplanation. — For the purposes of this article, the Government of the State means the person for the time being recognised by the President as the Maharaja of Jammu and Kashmir acting on the advice of the Council of Ministers for the time being in office under the Maharaja's Proclamation dated the fifth day of March, 1948;\n\n \n\n(c) the provisions of article 1 and of this article shall apply in relation to that State;\n\n \n\n(d) such of the other provisions of this Constitution shall apply in relation to that State subject to such exceptions and modifications as the President may by order1 specify:\n\n \n\n Provided that no such order which relates to the matters specified in the Instrument of Accession of the State referred to in paragraph (i) of sub-clause (b) shall be issued except in consultation with the Government of the State:\n\n \n\n Provided further that no such order which relates to matters other than those referred to in the last preceding proviso shall be issued except with the concurrence of that Government.\n\n \n\n(2) If the concurrence of the Government of the State referred to in paragraph (ii) of sub-clause (b) of clause (1) or in the second proviso to sub-clause (d) of that clause be given before the Constituent Assembly for the purpose of framing the Constitution of the State is convened, it shall be placed before such Assembly for such decision as it may take thereon.\n\n \n\n(3) Notwithstanding anything in the foregoing provisions of this article, the President may, by public notification, declare that this article shall cease to be operative or shall be operative only with such exceptions and modifications and from such date as he may specify:\n\n \n\n Provided that the recommendation of the Constituent Assembly of the State referred to in clause (2) shall be necessary before the President issues such a notification.",
     "part": "XXI",
     "part_name": "Temporary, Transitional and Special Provisions",
     "topic": "Special Provisions for Jammu and Kashmir",
     "type": "article",
-    "status": "active"
+    "status": "Abrogated — Presidential Order C.O. 272, 5 August 2019. Upheld by Supreme Court, 11 December 2023."
   },
   {
     "id": "article_371",
@@ -4909,7 +4893,7 @@
     "id": "article_371E",
     "article": "371E",
     "title": "Establishment of Central University in Andhra Pradesh",
-    "description": "Parliament may by law provide for the establishment of a University in the State of Andhra Pradesh.",
+    "description": "Article 371E of the Constitution of India — Establishment of Central University in Andhra Pradesh. This article falls under Part XXI (Temporary, Transitional and Special Provisions). \nFull text: Parliament may by law provide for the establishment of a University in the State of Andhra Pradesh.",
     "part": "XXI",
     "part_name": "Temporary, Transitional and Special Provisions",
     "topic": "Temporary, Transitional and Special Provisions",
@@ -5074,7 +5058,7 @@
     "id": "article_393",
     "article": "393",
     "title": "Short title",
-    "description": "This Constitution may be called the Constitution of India.",
+    "description": "Article 393 of the Constitution of India — Short title. This article falls under Part XXII (Short Title, Commencement, Repeals). \nFull text: This Constitution may be called the Constitution of India.",
     "part": "XXII",
     "part_name": "Short Title, Commencement, Repeals",
     "topic": "Short Title, Commencement, Repeals",
