@@ -1,0 +1,13 @@
+.message-list {
+  width: 100%;
+  padding: 24px 0;
+}
+
+.message-list-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
