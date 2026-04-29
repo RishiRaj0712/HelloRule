@@ -1,12 +1,14 @@
 import './WelcomeScreen.css'
 
 const SUGGESTIONS = [
+  // Constitution
   "What are the Fundamental Rights guaranteed by the Constitution?",
   "What does Article 21 say about the right to life?",
-  "What are the Directive Principles of State Policy?",
-  "How can the Constitution be amended?",
-  "What is the Preamble of the Indian Constitution?",
-  "What powers does the President have during an emergency?",
+  // BNS (criminal law)
+  "What is the punishment for murder under BNS?",
+  "What is the BNS equivalent of IPC Section 420?",
+  "What are the new offences added in BNS that weren't in IPC?",
+  "What does BNS say about cybercrime and organised crime?",
 ]
 
 export default function WelcomeScreen({ onSuggestion }) {

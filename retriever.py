@@ -16,32 +16,45 @@ CHROMA_DIR  = "./chroma_db"
 COLLECTION  = "constitution_of_india"
 EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 
-# Part keywords → Part number mapping
-# Used for automatic metadata filtering when query mentions a specific Part
-PART_KEYWORDS = {
-    "fundamental right":  "III",
-    "directive principle": "IV",
-    "fundamental duty":   "IVA",
-    "citizenship":        "II",
-    "emergency":          "XVIII",
-    "amendment":          None,   # type filter instead
-    "schedule":           None,   # schedule type
-    "union territory":    "I",
-    "parliament":         "V",
-    "president":          "V",
-    "governor":           "VI",
-    "high court":         "VI",
-    "supreme court":      "V",
-    "finance":            "XII",
-    "trade":              "XIII",
-    "election":           "XV",
-    "language":           "XVII",
-    "official language":  "XVII",
-    "union list":         None,   # trigger schedule type filter
-    "legislative list":   None,
-    "make laws":          "XI",   # Part XI covers legislative relations
-    "national emergency": "XVIII",
-    "declare emergency":  "XVIII",
+# Keywords mapping
+# Used for automatic metadata filtering when query mentions a specific keyword
+KEYWORDS = {
+    # Constitution
+    "fundamental right":  {"part": "III"},
+    "directive principle": {"part": "IV"},
+    "fundamental duty":   {"part": "IVA"},
+    "citizenship":        {"part": "II"},
+    "emergency":          {"part": "XVIII"},
+    "union territory":    {"part": "I"},
+    "parliament":         {"part": "V"},
+    "president":          {"part": "V"},
+    "governor":           {"part": "VI"},
+    "high court":         {"part": "VI"},
+    "supreme court":      {"part": "V"},
+    "finance":            {"part": "XII"},
+    "trade":              {"part": "XIII"},
+    "election":           {"part": "XV"},
+    "language":           {"part": "XVII"},
+    "official language":  {"part": "XVII"},
+    "make laws":          {"part": "XI"},
+    "national emergency": {"part": "XVIII"},
+    "declare emergency":  {"part": "XVIII"},
+
+    # BNS
+    "murder":          {"law": "BNS"},
+    "theft":           {"law": "BNS"},
+    "rape":            {"law": "BNS"},
+    "punishment for":  {"law": "BNS"},
+    "bail":            {"law": "BNS"},
+    "cheating":        {"law": "BNS"},
+    "robbery":         {"law": "BNS"},
+    "kidnapping":      {"law": "BNS"},
+    "defamation":      {"law": "BNS"},
+    "terrorism":       {"law": "BNS"},
+    "organised crime": {"law": "BNS"},
+    "stalking":        {"law": "BNS"},
+    "dowry":           {"law": "BNS"},
+    "sedition":        {"law": "BNS"},
 }
 
 
@@ -81,6 +94,18 @@ class Retriever:
         """
         query_lower = query.lower()
 
+        # Explicit law mentions
+        if "under bns" in query_lower or "bharatiya nyaya sanhita" in query_lower or "criminal law" in query_lower:
+            return {"law": "BNS"}
+        if "under the constitution" in query_lower or "constitution of india" in query_lower:
+            return {"law": "Constitution"}
+            
+        # IPC translation
+        # e.g. "IPC 302" -> translate to BNS search
+        # Since BNS chunks contain "[Old IPC: 302]", filtering to law=BNS allows the vector search to find it.
+        if "ipc" in query_lower or "indian penal code" in query_lower:
+            return {"law": "BNS"}
+
         # Check for amendment-specific queries
         if any(w in query_lower for w in ["amendment", "amended", "amend the constitution"]):
             return {"type": "amendment"}
@@ -89,12 +114,12 @@ class Retriever:
         if "schedule" in query_lower:
             return {"type": "schedule"}
 
-        # Check for Part-specific keywords
-        for keyword, part in PART_KEYWORDS.items():
-            if keyword in query_lower and part is not None:
-                return {"part": part}
+        # Check for keywords
+        for keyword, filters in KEYWORDS.items():
+            if keyword in query_lower:
+                return filters
 
-        # No filter — search all 1024 chunks
+        # No filter — search all chunks
         return None
 
     def search(self, query: str, top_k: int = 5) -> list[dict]:

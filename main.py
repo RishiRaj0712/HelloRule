@@ -158,7 +158,7 @@ async def chat(req: ChatRequest):
     return ChatResponse(
         answer=answer,
         sources=sources,
-        model_used="llama-3.1-8b-instant",
+        model_used=generator.model,
         chunks_used=len(chunks),
     )
 

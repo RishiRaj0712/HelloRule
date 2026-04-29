@@ -25,7 +25,10 @@ from chromadb.utils import embedding_functions
 # ─────────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────────
-JSON_PATH    = "data/constitution_final.json"
+LAW_FILES = [
+    "data/constitution_final.json",
+    "data/bns_final.json",
+]
 CHROMA_DIR   = "./chroma_db"
 COLLECTION   = "constitution_of_india"
 EMBED_MODEL  = "BAAI/bge-small-en-v1.5"
@@ -79,6 +82,30 @@ def build_context_prefix(entry: dict) -> str:
 
     elif entry_type == "amendment":
         parts.append(f"{entry.get('article', 'Amendment')} — {entry.get('title', '')}")
+
+    elif entry_type == "section":
+        section_num = entry.get("section", "")
+        title       = entry.get("title", "")
+        chapter     = entry.get("chapter", "")
+        chapter_name= entry.get("chapter_name", "")
+        topic       = entry.get("topic", "")
+        law         = entry.get("law", "BNS")
+        ipc         = entry.get("ipc_equivalent", "")
+
+        line1 = f"{law} - Section {section_num}"
+        if title:
+            line1 += f" — {title}"
+        if ipc:
+            line1 += f" [Old IPC: {ipc}]"
+        parts.append(line1)
+
+        context_bits = []
+        if chapter and chapter_name:
+            context_bits.append(f"Chapter {chapter}: {chapter_name}")
+        if topic and topic != chapter_name:
+            context_bits.append(f"Topic: {topic}")
+        if context_bits:
+            parts.append(f"({' | '.join(context_bits)})")
 
     # Add status warning for non-active entries
     status = entry.get("status", "active")
@@ -202,12 +229,12 @@ def chunk_entry(entry: dict) -> list[dict]:
         # Schedules can be huge (62k chars). Split aggressively.
         pieces = split_by_clauses(description, max_size=LARGE_CHUNK_SIZE)
 
-    elif entry_type == "article":
+    elif entry_type in ["article", "section"]:
         if len(description) <= SMALL_ENTRY_MAX:
-            # Short article — single chunk, no splitting
+            # Short article/section — single chunk, no splitting
             pieces = [description]
         else:
-            # Long article (like Art 352, 371D) — clause-aware splitting
+            # Long article/section — clause-aware splitting
             pieces = split_by_clauses(description, max_size=LARGE_CHUNK_SIZE)
     else:
         pieces = [description]
@@ -224,11 +251,16 @@ def chunk_entry(entry: dict) -> list[dict]:
         metadata = {
             "source_id":    entry_id,
             "article":      str(entry.get("article", "")),
+            "section":      str(entry.get("section", "")),
             "title":        str(entry.get("title", "")),
             "part":         str(entry.get("part", "") or ""),
             "part_name":    str(entry.get("part_name", "") or ""),
+            "chapter":      str(entry.get("chapter", "") or ""),
+            "chapter_name": str(entry.get("chapter_name", "") or ""),
             "topic":        str(entry.get("topic", "") or ""),
             "type":         entry_type,
+            "law":          str(entry.get("law", "Constitution")),
+            "ipc_equivalent": str(entry.get("ipc_equivalent", "") or ""),
             "status":       str(status),
             "chunk_index":  i,
             "total_chunks": len(pieces),
@@ -373,25 +405,31 @@ def build_vector_store(chunks: list[dict], reset: bool = False):
 
 def main():
     parser = argparse.ArgumentParser(description="LawBook India — RAG Ingestion Script")
-    parser.add_argument("--json",  default=JSON_PATH, help="Path to constitution_final.json")
     parser.add_argument("--reset", action="store_true", help="Delete and rebuild the vector store")
     args = parser.parse_args()
 
-    json_path = Path(args.json)
-    if not json_path.exists():
-        print(f"ERROR: JSON file not found at '{json_path}'")
-        print(f"  Make sure constitution_final.json is at: {json_path.resolve()}")
-        return
-
+    all_entries = []
+    
     # ── Load ──
-    print(f"\nLoading data from: {json_path}")
-    with open(json_path, encoding="utf-8") as f:
-        entries = json.load(f)
-    print(f"  Loaded {len(entries)} entries\n")
+    for fpath in LAW_FILES:
+        json_path = Path(fpath)
+        if not json_path.exists():
+            print(f"WARNING: JSON file not found at '{json_path}'. Skipping.")
+            continue
+            
+        print(f"\nLoading data from: {json_path}")
+        with open(json_path, encoding="utf-8") as f:
+            entries = json.load(f)
+            all_entries.extend(entries)
+        print(f"  Loaded {len(entries)} entries\n")
+
+    if not all_entries:
+        print("ERROR: No entries loaded. Make sure the JSON files exist.")
+        return
 
     # ── Step 2.1: Chunk ──
     print("STEP 1/2 — Chunking entries...")
-    chunks = chunk_all_entries(entries)
+    chunks = chunk_all_entries(all_entries)
 
     # ── Steps 2.2 + 2.3: Embed + Store ──
     print("STEP 2/2 — Embedding + storing in ChromaDB...")

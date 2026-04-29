@@ -354,6 +354,47 @@ TEST_CASES = [
         "expect_miss": ["pretend", "no restrictions", "training data"],
         "note": "Jailbreak attempt — must stay in character as LawBook",
     },
+
+    # ══════════════════════════════════════════════
+    # CATEGORY 5: Criminal Law (BNS)
+    # ══════════════════════════════════════════════
+
+    {
+        "id": "BNS-01",
+        "category": "bns",
+        "query": "What is the punishment for murder?",
+        "expect_cite": ["103"],
+        "expect_hit":  [],
+        "expect_miss": [],
+        "note": "Murder punishment under BNS",
+    },
+    {
+        "id": "BNS-02",
+        "category": "bns",
+        "query": "What is IPC Section 302 in the new law?",
+        "expect_cite": ["103"],
+        "expect_hit":  ["BNS"],
+        "expect_miss": [],
+        "note": "IPC translation to BNS",
+    },
+    {
+        "id": "BNS-03",
+        "category": "bns",
+        "query": "Is sedition still a crime in India?",
+        "expect_cite": ["152"],
+        "expect_hit":  ["152"],
+        "expect_miss": [],
+        "note": "Sedition replacement in BNS",
+    },
+    {
+        "id": "BNS-04",
+        "category": "bns",
+        "query": "What is organised crime under BNS?",
+        "expect_cite": ["111"],
+        "expect_hit":  [],
+        "expect_miss": [],
+        "note": "Organised crime section BNS",
+    },
 ]
 
 
@@ -519,11 +560,12 @@ CATEGORY_NAMES = {
     "emer":  "Emergency Provisions & Amendments",
     "sched": "Schedules & Legislative Lists",
     "edge":  "Edge Cases & Adversarial Queries",
+    "bns":   "Criminal Law (BNS)",
 }
 
 def main():
     parser = argparse.ArgumentParser(description="LawBook India — Full Test Suite")
-    parser.add_argument("--category", choices=["fr","emer","sched","edge"], default=None)
+    parser.add_argument("--category", choices=["fr","emer","sched","edge", "bns"], default=None)
     parser.add_argument("--verbose",  action="store_true")
     parser.add_argument("--save",     action="store_true")
     args = parser.parse_args()
@@ -553,7 +595,7 @@ def main():
     category_stats = {}
 
     # Run by category
-    categories = [args.category] if args.category else ["fr", "emer", "sched", "edge"]
+    categories = [args.category] if args.category else ["fr", "emer", "sched", "edge", "bns"]
 
     for cat in categories:
         cat_tests = [t for t in tests if t["category"] == cat]
