@@ -220,15 +220,17 @@ TEST_CASES = [
     # ══════════════════════════════════════════════
 
     # Edge Type A: Out of scope (should redirect, not hallucinate)
+    # NOTE: EDGE-01 was updated — murder IS now in scope via BNS data.
+    # The old test expected "out of scope" but BNS Section 103 covers murder.
     {
         "id": "EDGE-01",
         "category": "edge",
-        "edge_type": "out_of_scope",
+        "edge_type": "cross_law",
         "query": "What is the punishment for murder in India?",
-        "expect_cite": [],
-        "expect_hit":  ["IPC", "outside", "Constitution", "not covered"],
-        "expect_miss": ["death penalty", "life imprisonment", "Section 302"],
-        "note": "IPC question — should redirect, NOT fabricate an answer",
+        "expect_cite": ["103"],
+        "expect_hit":  ["BNS", "punishment"],
+        "expect_miss": ["Section 302", "IPC"],
+        "note": "Should answer from BNS Section 103, NOT cite old IPC 302",
     },
     {
         "id": "EDGE-02",
@@ -236,9 +238,9 @@ TEST_CASES = [
         "edge_type": "out_of_scope",
         "query": "How do I file an FIR?",
         "expect_cite": [],
-        "expect_hit":  ["CrPC", "outside", "Constitution", "not covered"],
-        "expect_miss": ["police station", "Section 154", "complaint"],
-        "note": "CrPC question — should not hallucinate procedure",
+        "expect_hit":  ["BNSS", "outside", "not covered"],
+        "expect_miss": ["Section 154"],
+        "note": "BNSS/CrPC question — FIR procedure is not in Constitution or BNS",
     },
     {
         "id": "EDGE-03",

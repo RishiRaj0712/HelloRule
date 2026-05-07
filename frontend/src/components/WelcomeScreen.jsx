@@ -17,12 +17,13 @@ export default function WelcomeScreen({ onSuggestion }) {
       <div className="welcome-hero">
         <div className="welcome-seal">⚖</div>
         <h2 className="welcome-heading">
-          Ask the Constitution
+          Ask Indian Law
         </h2>
         <p className="welcome-desc">
-          Ask any question about the Constitution of India. Get accurate,
-          cited answers drawn directly from all 395 Articles, 12 Schedules,
-          and 106 Amendments.
+          Ask any question about the Constitution of India or the
+          Bharatiya Nyaya Sanhita (BNS) 2023. Get accurate, cited answers
+          drawn directly from 395 Articles, 12 Schedules, 106 Amendments,
+          and 358 BNS Sections.
         </p>
         <div className="welcome-divider">
           <span className="divider-line" />
@@ -46,7 +47,7 @@ export default function WelcomeScreen({ onSuggestion }) {
       </div>
 
       <p className="welcome-disclaimer">
-        Answers are grounded in constitutional text only. For IPC, CrPC, or specific Acts, consult a legal expert.
+        Answers are grounded in the Constitution of India and the Bharatiya Nyaya Sanhita (BNS) 2023 only. For BNSS, BSA, or other specific Acts, consult a legal expert.
       </p>
     </div>
   )

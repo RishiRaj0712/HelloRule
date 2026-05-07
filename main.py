@@ -30,7 +30,7 @@ from prompt import build_prompt, extract_sources_from_chunks
 
 app = FastAPI(
     title="LawBook India API",
-    description="RAG-based Q&A on the Constitution of India",
+    description="RAG-based Q&A on the Constitution of India and Bharatiya Nyaya Sanhita (BNS)",
     version="1.0.0",
 )
 
@@ -84,13 +84,15 @@ class ChatRequest(BaseModel):
 
 
 class SourceItem(BaseModel):
-    article:   str
-    title:     str
-    part:      str
-    part_name: str
-    type:      str
-    status:    str
-    score:     float
+    article:   str   = ""
+    section:   str   = ""
+    law:       str   = "Constitution"
+    title:     str   = ""
+    part:      str   = ""
+    part_name: str   = ""
+    type:      str   = ""
+    status:    str   = ""
+    score:     float = 0.0
 
 
 class ChatResponse(BaseModel):
