@@ -30,8 +30,8 @@ from prompt import build_prompt, extract_sources_from_chunks
 
 app = FastAPI(
     title="LawBook India API",
-    description="RAG-based Q&A on the Constitution of India and Bharatiya Nyaya Sanhita (BNS)",
-    version="1.0.0",
+    description="RAG-based Q&A on the Constitution of India, Bharatiya Nyaya Sanhita (BNS), and Bharatiya Nagarik Suraksha Sanhita (BNSS)",
+    version="2.0.0",
 )
 
 # CORS — allows the React frontend (localhost:3000) to call this API
@@ -113,10 +113,11 @@ async def health_check():
     Call this before starting the frontend to confirm the backend is ready.
     """
     return {
-        "status":     "ok",
-        "retriever":  retriever is not None,
-        "generator":  generator is not None,
-        "collection": "constitution_of_india",
+        "status":       "ok",
+        "retriever":    retriever is not None,
+        "generator":    generator is not None,
+        "collection":   "constitution_of_india",
+        "laws_covered": ["Constitution of India", "BNS 2023", "BNSS 2023"],
     }
 
 

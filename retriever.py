@@ -40,12 +40,11 @@ KEYWORDS = {
     "national emergency": {"part": "XVIII"},
     "declare emergency":  {"part": "XVIII"},
 
-    # BNS
+    # BNS (substantive criminal law — offences & punishments)
     "murder":          {"law": "BNS"},
     "theft":           {"law": "BNS"},
     "rape":            {"law": "BNS"},
     "punishment for":  {"law": "BNS"},
-    "bail":            {"law": "BNS"},
     "cheating":        {"law": "BNS"},
     "robbery":         {"law": "BNS"},
     "kidnapping":      {"law": "BNS"},
@@ -55,6 +54,34 @@ KEYWORDS = {
     "stalking":        {"law": "BNS"},
     "dowry":           {"law": "BNS"},
     "sedition":        {"law": "BNS"},
+
+    # BNSS (procedural criminal law — process, courts, bail, investigation)
+    "bail":              {"law": "BNSS"},
+    "arrest":            {"law": "BNSS"},
+    "fir":               {"law": "BNSS"},
+    "warrant":           {"law": "BNSS"},
+    "summons":           {"law": "BNSS"},
+    "investigation":     {"law": "BNSS"},
+    "cognizable":        {"law": "BNSS"},
+    "non-cognizable":    {"law": "BNSS"},
+    "magistrate":        {"law": "BNSS"},
+    "trial":             {"law": "BNSS"},
+    "appeal":            {"law": "BNSS"},
+    "plea bargaining":   {"law": "BNSS"},
+    "bail bond":         {"law": "BNSS"},
+    "anticipatory bail": {"law": "BNSS"},
+    "charge sheet":      {"law": "BNSS"},
+    "police station":    {"law": "BNSS"},
+    "zero fir":          {"law": "BNSS"},
+    "e-fir":             {"law": "BNSS"},
+    "remand":            {"law": "BNSS"},
+    "custody":           {"law": "BNSS"},
+    "search and seizure":{"law": "BNSS"},
+    "confession":        {"law": "BNSS"},
+    "witness":           {"law": "BNSS"},
+    "sentence":          {"law": "BNSS"},
+    "mercy petition":    {"law": "BNSS"},
+    "compounding":       {"law": "BNSS"},
 }
 
 
@@ -99,7 +126,14 @@ class Retriever:
             return {"law": "BNS"}
         if "under the constitution" in query_lower or "constitution of india" in query_lower:
             return {"law": "Constitution"}
-            
+        if "under bnss" in query_lower or "bharatiya nagarik suraksha" in query_lower or "nagarik suraksha sanhita" in query_lower:
+            return {"law": "BNSS"}
+
+        # CrPC translation -> BNSS
+        # Since BNSS chunks contain "[Old CrPC: X]", filtering to law=BNSS allows the vector search to find it.
+        if "crpc" in query_lower or "criminal procedure code" in query_lower or "code of criminal procedure" in query_lower:
+            return {"law": "BNSS"}
+
         # IPC translation
         # e.g. "IPC 302" -> translate to BNS search
         # Since BNS chunks contain "[Old IPC: 302]", filtering to law=BNS allows the vector search to find it.

@@ -28,6 +28,7 @@ from chromadb.utils import embedding_functions
 LAW_FILES = [
     "data/constitution_final.json",
     "data/bns_final.json",
+    "data/bnss_final.json",
 ]
 CHROMA_DIR   = "./chroma_db"
 COLLECTION   = "constitution_of_india"
@@ -91,12 +92,15 @@ def build_context_prefix(entry: dict) -> str:
         topic       = entry.get("topic", "")
         law         = entry.get("law", "BNS")
         ipc         = entry.get("ipc_equivalent", "")
+        crpc        = entry.get("crpc_equivalent", "")
 
         line1 = f"{law} - Section {section_num}"
         if title:
             line1 += f" — {title}"
         if ipc:
             line1 += f" [Old IPC: {ipc}]"
+        if crpc:
+            line1 += f" [Old CrPC: {crpc}]"
         parts.append(line1)
 
         context_bits = []
@@ -261,6 +265,7 @@ def chunk_entry(entry: dict) -> list[dict]:
             "type":         entry_type,
             "law":          str(entry.get("law", "Constitution")),
             "ipc_equivalent": str(entry.get("ipc_equivalent", "") or ""),
+            "crpc_equivalent": str(entry.get("crpc_equivalent", "") or ""),
             "status":       str(status),
             "chunk_index":  i,
             "total_chunks": len(pieces),
