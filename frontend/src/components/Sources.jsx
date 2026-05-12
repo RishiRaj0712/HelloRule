@@ -3,10 +3,10 @@ import './Sources.css'
 export default function Sources({ sources }) {
   if (!sources || sources.length === 0) return null
 
-  // Deduplicate by article number
+  // Deduplicate by article/section number
   const seen = new Set()
   const unique = sources.filter(s => {
-    const key = s.article || s.title
+    const key = s.section ? `${s.law}-${s.section}` : s.article || s.title
     if (seen.has(key)) return false
     seen.add(key)
     return true
@@ -15,7 +15,7 @@ export default function Sources({ sources }) {
   return (
     <div className="sources-panel">
       <div className="sources-header">
-        <span className="sources-label">Constitutional Sources</span>
+        <span className="sources-label">Legal Sources</span>
       </div>
       <div className="sources-list">
         {unique.map((src, i) => (
@@ -31,6 +31,9 @@ function SourceChip({ source }) {
   const typeLabel = source.type === 'amendment' ? 'AMDT'
                   : source.type === 'schedule'  ? 'SCH'
                   : source.type === 'preamble'  ? 'PRE'
+                  : source.type === 'section' && source.law === 'BNS' ? 'BNS'
+                  : source.type === 'section' && source.law === 'BNSS' ? 'BNSS'
+                  : source.type === 'note' ? 'NOTE'
                   : 'ART'
 
   const score = source.score ? Math.round(source.score * 100) : null
@@ -43,7 +46,9 @@ function SourceChip({ source }) {
         <span className="chip-article">
           {source.type === 'article' && source.article
             ? `Article ${source.article}`
-            : source.title?.replace('Constitution', 'Const.') || 'Unknown'}
+            : source.type === 'section' && source.section
+            ? `Sec. ${source.section} — ${source.title}`
+            : (source.title?.replace('Constitution', 'Const.') || 'Unknown').substring(0, 55)}
         </span>
         {source.part && (
           <span className="chip-part">Part {source.part}</span>
