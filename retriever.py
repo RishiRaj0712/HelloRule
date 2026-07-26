@@ -98,6 +98,30 @@ _BARE_SECTION_RE    = re.compile(r'\bSection\s+(\d{1,4}[A-Za-z]{0,2})\b', re.IGN
 _AMENDMENT_ORDINAL_RE = re.compile(r'\b(\d{1,3})(?:st|nd|rd|th)?\s+Amendment\b', re.IGNORECASE)
 _SCHEDULE_ORDINAL_RE  = re.compile(r'\b(\d{1,2})(?:st|nd|rd|th)?\s+Schedule\b', re.IGNORECASE)
 
+# Old-law references ("IPC 420", "IPC Section 420", "Section 302 of the IPC").
+# The number here is an OLD-law section — it must be TRANSLATED to the new
+# BNS/BNSS section, never matched literally (IPC 420 is BNS 318, not BNSS 420).
+# These must be detected before the bare-section match, which would otherwise
+# grab the old number and look it up directly in the new law.
+_IPC_REF_RE  = re.compile(
+    r'\b(?:IPC|Indian\s+Penal\s+Code)\s+(?:Section\s+)?(\d{1,4}[A-Za-z]{0,2})\b'
+    r'|\bSection\s+(\d{1,4}[A-Za-z]{0,2})\s+of\s+(?:the\s+)?(?:IPC|Indian\s+Penal\s+Code)\b',
+    re.IGNORECASE)
+_CRPC_REF_RE = re.compile(
+    r'\b(?:CrPC|Code\s+of\s+Criminal\s+Procedure|Criminal\s+Procedure\s+Code)\s+(?:Section\s+)?(\d{1,4}[A-Za-z]{0,2})\b'
+    r'|\bSection\s+(\d{1,4}[A-Za-z]{0,2})\s+of\s+(?:the\s+)?(?:CrPC|Code\s+of\s+Criminal\s+Procedure|Criminal\s+Procedure\s+Code)\b',
+    re.IGNORECASE)
+
+# Repealed-and-replaced sections that the auto-built maps miss: the new
+# section carries no "ipc_equivalent"/"crpc_equivalent" back-reference to the
+# old number (because the offence was rewritten, not renumbered), so it must
+# be aliased explicitly. Keys are UPPERCASE old-law numbers.
+#   IPC 124A (sedition) was repealed; BNS 152 is its closest replacement.
+# (IPC 377 is intentionally NOT here — it has no BNS replacement, so it falls
+#  through to semantic search, which surfaces the "not included in BNS" note.)
+_IPC_ALIAS  = {"124A": "152"}
+_CRPC_ALIAS = {}
+
 
 class Retriever:
     """
@@ -121,7 +145,53 @@ class Retriever:
         )
 
         count = self.collection.count()
-        print(f"[Retriever] Ready — {count} chunks loaded from {CHROMA_DIR}/")
+
+        # Build old-law -> new-law translation maps from the section metadata
+        # (ipc_equivalent / crpc_equivalent). Used to turn "IPC 420" into the
+        # correct BNS section (318) rather than matching 420 literally.
+        self.ipc_to_bns, self.crpc_to_bnss = self._build_translation_maps()
+        print(f"[Retriever] Ready — {count} chunks loaded from {CHROMA_DIR}/ "
+              f"({len(self.ipc_to_bns)} IPC→BNS, {len(self.crpc_to_bnss)} CrPC→BNSS mappings)")
+
+    def _build_translation_maps(self) -> tuple[dict, dict]:
+        """
+        Reverse-map old-law section numbers to new-law sections using each
+        entry's ipc_equivalent / crpc_equivalent metadata. Only unambiguous
+        1:1 mappings are kept — old numbers that map to several new sections
+        (e.g. the omnibus 'Definitions' section) fall back to filtered
+        semantic search instead.
+        """
+        from collections import defaultdict
+
+        ipc_map  = defaultdict(set)
+        crpc_map = defaultdict(set)
+
+        data = self.collection.get(include=["metadatas"])
+        for meta in data["metadatas"]:
+            if meta.get("type") != "section":
+                continue
+            section = str(meta.get("section", "")).strip()
+            if not section:
+                continue
+            for old in str(meta.get("ipc_equivalent", "")).split(","):
+                old = old.strip()
+                if old:
+                    ipc_map[old].add(section)
+            for old in str(meta.get("crpc_equivalent", "")).split(","):
+                old = old.strip()
+                if old:
+                    crpc_map[old].add(section)
+
+        ipc_single  = {k: next(iter(v)) for k, v in ipc_map.items() if len(v) == 1}
+        crpc_single = {k: next(iter(v)) for k, v in crpc_map.items() if len(v) == 1}
+
+        # Fill gaps for repealed-and-replaced sections the metadata can't map.
+        for old, new in _IPC_ALIAS.items():
+            ipc_single.setdefault(old, new)
+        for old, new in _CRPC_ALIAS.items():
+            crpc_single.setdefault(old, new)
+
+        return ipc_single, crpc_single
 
     def _detect_filters(self, query: str) -> dict | None:
         """
@@ -174,8 +244,32 @@ class Retriever:
         """
         Detect a literal article/section number in the query and build an
         exact ChromaDB metadata filter for it. Returns None if no direct
-        numeric reference is found.
+        numeric reference is found (or if an old-law reference can't be
+        translated — those defer to filtered semantic search).
         """
+        # ── Old-law references first ("IPC 420", "CrPC Section 154") ──
+        # The number is an OLD section that must be TRANSLATED, not matched
+        # literally. If we have a clean 1:1 mapping, exact-match the new
+        # section; otherwise return None so the query falls through to a
+        # law-filtered semantic search (which can still find it via the
+        # "[Old IPC: N]" text embedded in each chunk). Either way we must
+        # NOT let the bare-section match below grab the old number.
+        m = _IPC_REF_RE.search(query)
+        if m:
+            old = (m.group(1) or m.group(2)).upper()
+            new_section = self.ipc_to_bns.get(old)
+            if new_section:
+                return {"$and": [{"law": "BNS"}, {"section": new_section.upper()}]}
+            return None
+
+        m = _CRPC_REF_RE.search(query)
+        if m:
+            old = (m.group(1) or m.group(2)).upper()
+            new_section = self.crpc_to_bnss.get(old)
+            if new_section:
+                return {"$and": [{"law": "BNSS"}, {"section": new_section.upper()}]}
+            return None
+
         m = _ARTICLE_NUM_RE.search(query)
         if m:
             return {"$and": [{"law": "Constitution"}, {"article": m.group(1).upper()}]}
