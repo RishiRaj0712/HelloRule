@@ -10,6 +10,7 @@ __pycache__/
 *.pyo
 .Python
 *.egg-info/
+venv/
 
 # Node
 frontend/node_modules/
@@ -20,3 +21,10 @@ frontend/dist/
 
 # Test artifacts
 test_report.json
+
+# Eval artifacts (generated/transient — regenerate with build_coverage_cases.py / eval_coverage.py)
+evals/eval_cases_full.json
+evals/eval_cases_sample20.json
+evals/eval_progress.json
+evals/eval_report.json
+backend.log

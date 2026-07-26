@@ -8,6 +8,7 @@ Used by: main.py → pipeline → retriever.search()
 """
 
 import os
+import re
 import chromadb
 from chromadb.utils import embedding_functions
 
@@ -85,6 +86,19 @@ KEYWORDS = {
 }
 
 
+# Direct numeric-citation patterns ("Article 21", "Section 103 of the BNS",
+# "BNSS Section 173"). Semantic search alone frequently retrieves the wrong
+# provision for these — hundreds of BNS/BNSS sections use similar wording,
+# so a query for an exact number needs an exact metadata match, not a
+# similarity ranking. See _detect_exact_reference().
+_ARTICLE_NUM_RE     = re.compile(r'\bArticle\s+(\d{1,3}[A-Za-z]{0,2})\b', re.IGNORECASE)
+_LAW_SECTION_NUM_RE = re.compile(r'\b(BNS|BNSS)\s+Section\s+(\d{1,4}[A-Za-z]{0,2})\b', re.IGNORECASE)
+_SECTION_OF_LAW_RE  = re.compile(r'\bSection\s+(\d{1,4}[A-Za-z]{0,2})\s+of\s+(?:the\s+)?(BNS|BNSS)\b', re.IGNORECASE)
+_BARE_SECTION_RE    = re.compile(r'\bSection\s+(\d{1,4}[A-Za-z]{0,2})\b', re.IGNORECASE)
+_AMENDMENT_ORDINAL_RE = re.compile(r'\b(\d{1,3})(?:st|nd|rd|th)?\s+Amendment\b', re.IGNORECASE)
+_SCHEDULE_ORDINAL_RE  = re.compile(r'\b(\d{1,2})(?:st|nd|rd|th)?\s+Schedule\b', re.IGNORECASE)
+
+
 class Retriever:
     """
     Wraps ChromaDB with a clean .search() interface.
@@ -156,6 +170,81 @@ class Retriever:
         # No filter — search all chunks
         return None
 
+    def _detect_exact_reference(self, query: str) -> dict | None:
+        """
+        Detect a literal article/section number in the query and build an
+        exact ChromaDB metadata filter for it. Returns None if no direct
+        numeric reference is found.
+        """
+        m = _ARTICLE_NUM_RE.search(query)
+        if m:
+            return {"$and": [{"law": "Constitution"}, {"article": m.group(1).upper()}]}
+
+        m = _LAW_SECTION_NUM_RE.search(query)
+        if m:
+            return {"$and": [{"law": m.group(1).upper()}, {"section": m.group(2).upper()}]}
+
+        m = _SECTION_OF_LAW_RE.search(query)
+        if m:
+            return {"$and": [{"law": m.group(2).upper()}, {"section": m.group(1).upper()}]}
+
+        # "Section 103" with no law named — try BNS/BNSS both (Constitution
+        # uses "Article", never "Section", so it's excluded here).
+        m = _BARE_SECTION_RE.search(query)
+        if m:
+            return {"$and": [{"law": {"$in": ["BNS", "BNSS"]}}, {"section": m.group(1).upper()}]}
+
+        m = _AMENDMENT_ORDINAL_RE.search(query)
+        if m:
+            return {"$and": [{"law": "Constitution"}, {"article": f"Amendment {int(m.group(1))}"}]}
+
+        # Schedules are stored as "Schedule N" or, for the 7th Schedule's
+        # three sub-lists, "Schedule N — Union/State/Concurrent List" — an
+        # exact-equality where filter can't do a prefix match, so this is
+        # flagged for special handling in _exact_match().
+        m = _SCHEDULE_ORDINAL_RE.search(query)
+        if m:
+            return {"_schedule_num": int(m.group(1))}
+
+        return None
+
+    def _exact_match(self, where_filter: dict) -> list[dict]:
+        """
+        Direct metadata lookup, no similarity ranking — every chunk of the
+        matched entry, ordered by chunk_index. Used for direct numeric
+        citations where semantic search is unreliable.
+        """
+        if "_schedule_num" in where_filter:
+            # Schedule article values aren't a clean equality match (see note
+            # above) — fetch all schedules and prefix-match in Python, being
+            # careful that "Schedule 1" doesn't also match "Schedule 10"-"19".
+            prefix = f"Schedule {where_filter['_schedule_num']}"
+            results = self.collection.get(
+                where={"$and": [{"type": "schedule"}, {"law": "Constitution"}]},
+                include=["documents", "metadatas"],
+            )
+            chunks = []
+            for i in range(len(results["ids"])):
+                meta = results["metadatas"][i]
+                article = str(meta.get("article", ""))
+                if article == prefix or article.startswith(prefix + " "):
+                    chunks.append({"text": results["documents"][i], "metadata": meta, "score": 1.0})
+            chunks.sort(key=lambda c: int(c["metadata"].get("chunk_index", 0)))
+            return chunks
+
+        results = self.collection.get(where=where_filter, include=["documents", "metadatas"])
+
+        chunks = []
+        for i in range(len(results["ids"])):
+            chunks.append({
+                "text":     results["documents"][i],
+                "metadata": results["metadatas"][i],
+                "score":    1.0,  # exact match, not a similarity score
+            })
+
+        chunks.sort(key=lambda c: int(c["metadata"].get("chunk_index", 0)))
+        return chunks
+
     def search(self, query: str, top_k: int = 5) -> list[dict]:
         """
         Find the top-K chunks most relevant to the query.
@@ -201,6 +290,25 @@ class Retriever:
 
         This prevents the LLM from getting too little context.
         """
+        # ── Exact numeric citation ("Article 21", "Section 103 of the BNS") ──
+        # Try this before semantic search — with hundreds of similarly-worded
+        # BNS/BNSS sections, similarity ranking alone frequently picks the
+        # wrong one for a direct number lookup.
+        exact_filter = self._detect_exact_reference(query)
+        if exact_filter:
+            exact_chunks = self._exact_match(exact_filter)
+            if exact_chunks:
+                if len(exact_chunks) < top_k:
+                    exact_ids = {(c["metadata"].get("source_id"), c["metadata"].get("chunk_index")) for c in exact_chunks}
+                    filler = self.search(query, top_k=top_k)
+                    for c in filler:
+                        key = (c["metadata"].get("source_id"), c["metadata"].get("chunk_index"))
+                        if key not in exact_ids and len(exact_chunks) < top_k:
+                            exact_chunks.append(c)
+                return exact_chunks[:top_k]
+            # No hit (e.g. article number doesn't exist / was repealed and
+            # dropped from the dataset) — fall through to normal search below.
+
         where_filter = self._detect_filters(query)
 
         if where_filter:

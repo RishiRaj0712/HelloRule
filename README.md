@@ -38,8 +38,40 @@ User question → Embed & search ChromaDB → Retrieve top 5 chunks → Build pr
 ├── generator.py # Groq LLM integration
 ├── prompt.py # System prompt & prompt assembly
 ├── test_suite.py # 26 automated tests
+├── evals/ # RAG evaluation framework
+│   ├── eval_lib.py # Scoring (citation parsing, faithfulness)
+│   ├── build_coverage_cases.py # Ground-truth case generator from law JSON
+│   └── eval_coverage.py # Systematic per-law coverage eval runner
 ├── data/ # Constitution dataset (JSON)
 └── frontend/ # React chat UI
+```
+
+## Evaluation
+
+A ground-truth coverage eval runs one auto-generated question per entry across all
+three laws (**1,481 / 1,482 cases scored**) and grades three layers independently:
+**retrieval** (was the correct provision fetched?), **citation** (did the model cite
+the right section, and never one it didn't retrieve?), and **faithfulness** (does the
+answer match the real legal text — embedding similarity, escalated to an LLM judge only
+when borderline).
+
+| Law | n | Retrieval | Citation recall | Citation precision | Faithfulness |
+|-----|----|-----------|-----------------|--------------------|--------------|
+| Constitution | 585 | 100% | 88.2% | 79.0% | 0.831 |
+| BNS | 361 | 100% | 100% | 97.3% | 0.880 |
+| BNSS | 535 | 100% | 100% | 92.0% | 0.869 |
+
+**Retrieval is 100% across all entries** after adding exact-match metadata filtering for
+direct number lookups (e.g. "Article 21") — previously as low as 21% on BNS via semantic
+search alone. Zero LLM-judge escalations across the full run (no answer scored low enough
+on faithfulness to need review). The Constitution's lower citation precision (79%) is the
+one open item: it partly reflects legitimate cross-referencing of related articles rather
+than pure hallucination, but tightening the prompt's citation discipline is the next step.
+
+```bash
+python3 evals/build_coverage_cases.py        # generate cases from the law JSON
+python3 evals/eval_coverage.py --mode sample # quick ~60-case run
+python3 evals/eval_coverage.py --mode full   # full ~1,480-case sweep (resumable via --resume)
 ```
 
 ## Disclaimer
