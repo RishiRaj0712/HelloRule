@@ -23,6 +23,12 @@ from retriever import Retriever
 from generator import Generator
 from prompt import build_prompt, extract_sources_from_chunks
 
+# Multi-agent layer (Phase 3) — new path, built on top of the same retriever/generator.
+from agents.router import Router
+from agents.specialist import build_specialists
+from agents.synthesizer import Synthesizer
+from agents.orchestrator import Orchestrator
+
 
 # ─────────────────────────────────────────────
 # APP SETUP
@@ -54,13 +60,22 @@ app.add_middleware(
 
 retriever = None
 generator = None
+orchestrator = None   # multi-agent coordinator (Phase 3)
 
 @app.on_event("startup")
 async def startup_event():
-    global retriever, generator
+    global retriever, generator, orchestrator
     print("\n[LawBook] Starting up...")
     retriever = Retriever()   # loads ChromaDB + embedding model
-    generator = Generator()   # configures Gemini API
+    generator = Generator()   # configures Groq API
+
+    # Multi-agent layer reuses the SAME retriever + generator (dependency
+    # injection) — no second embedding-model load, no duplicated clients.
+    router = Router()
+    specialists = build_specialists(retriever, generator)
+    synthesizer = Synthesizer(generator)
+    orchestrator = Orchestrator(router, specialists, synthesizer)
+
     print("[LawBook] Ready to serve requests\n")
 
 
@@ -100,6 +115,19 @@ class ChatResponse(BaseModel):
     sources:    list[SourceItem]
     model_used: str
     chunks_used: int
+
+
+class RoutingInfo(BaseModel):
+    laws:      list[str] = []
+    reasoning: str       = ""
+
+
+class MultiAgentResponse(BaseModel):
+    answer:       str
+    sources:      list[SourceItem]
+    routing:      RoutingInfo          # which law(s) the supervisor chose + why
+    agents_used:  list[str]            # specialists that actually ran
+    synthesized:  bool                 # was a synthesis step performed?
 
 
 # ─────────────────────────────────────────────
@@ -163,6 +191,36 @@ async def chat(req: ChatRequest):
         sources=sources,
         model_used=generator.model,
         chunks_used=len(chunks),
+    )
+
+
+@app.post("/api/chat/multiagent", response_model=MultiAgentResponse)
+async def chat_multiagent(req: ChatRequest):
+    """
+    Multi-agent Q&A endpoint (Phase 3).
+
+    Instead of one generalist pipeline, a supervisor routes the question to the
+    relevant law specialist(s); multi-law questions run in parallel and are
+    synthesized into one answer. Runs alongside /api/chat — same retriever and
+    generator, different orchestration.
+    """
+    if not orchestrator:
+        raise HTTPException(status_code=503, detail="Models not yet loaded. Try again in a moment.")
+
+    query = req.query.strip()
+    if not query:
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+    if len(query) > 1000:
+        raise HTTPException(status_code=400, detail="Query too long (max 1000 characters).")
+
+    result = orchestrator.answer(query, top_k=req.top_k)
+
+    return MultiAgentResponse(
+        answer=result["answer"],
+        sources=result["sources"],
+        routing=RoutingInfo(**result["routing"]),
+        agents_used=result["agents_used"],
+        synthesized=result["synthesized"],
     )
 
 
