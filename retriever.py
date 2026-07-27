@@ -376,6 +376,48 @@ class Retriever:
 
         return chunks
 
+    def search_scoped(self, query: str, law: str, top_k: int = 5) -> list[dict]:
+        """
+        Retrieve ONLY within a single law — used by the multi-agent specialists
+        (agents/specialist.py), where the supervisor has already decided the
+        law and each specialist must stay in its lane.
+
+        This is a NEW method (the existing app keeps using search_with_fallback
+        unchanged) — an additive, backward-compatible extension.
+
+        It still benefits from the exact-match / IPC-CrPC translation logic,
+        but only when that resolves to THIS law; otherwise it does a plain
+        law-filtered semantic search.
+        """
+        # Exact/translation first — but keep only hits belonging to `law`.
+        # (For a correctly-routed question these already match; the filter is
+        # a safety net against, e.g., a bare "Section 5" resolving to the other
+        # criminal-law book.)
+        exact_filter = self._detect_exact_reference(query)
+        if exact_filter:
+            exact_chunks = [c for c in self._exact_match(exact_filter)
+                            if c["metadata"].get("law") == law]
+            if exact_chunks:
+                return exact_chunks[:top_k]
+
+        # Law-scoped semantic search — the hard {"law": law} filter is what
+        # makes this a "specialist" retrieval.
+        results = self.collection.query(
+            query_texts=[query],
+            n_results=top_k,
+            where={"law": law},
+            include=["documents", "metadatas", "distances"],
+        )
+
+        chunks = []
+        for i in range(len(results["ids"][0])):
+            chunks.append({
+                "text":     results["documents"][0][i],
+                "metadata": results["metadatas"][0][i],
+                "score":    round(1 - results["distances"][0][i], 4),
+            })
+        return chunks
+
     def search_with_fallback(self, query: str, top_k: int = 5) -> list[dict]:
         """
         Same as search() but if the filtered search returns fewer than
