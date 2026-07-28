@@ -27,4 +27,5 @@ evals/eval_cases_full.json
 evals/eval_cases_sample20.json
 evals/eval_progress.json
 evals/eval_report.json
+evals/last_multiagent_eval.log
 backend.log

@@ -53,13 +53,24 @@ def call_api(query: str, history: list = None, top_k: int = 5, timeout: int = 11
     instead of the real rate-limit response, and eval_coverage.py's circuit
     breaker (which pattern-matches on the rate-limit text) never fires.
     """
+    return _post("/api/chat", {"query": query, "history": history or [], "top_k": top_k}, timeout)
+
+
+def call_api_multiagent(query: str, top_k: int = 5, timeout: int = 180) -> dict:
+    """
+    Call the multi-agent endpoint (/api/chat/multiagent). Same retry behaviour
+    as call_api, but a longer default timeout: a multi-law question fans out to
+    several specialists plus a synthesizer, so worst-case latency is higher.
+    Response shape: {answer, sources, routing, agents_used, synthesized}.
+    """
+    return _post("/api/chat/multiagent", {"query": query, "top_k": top_k}, timeout)
+
+
+def _post(path: str, payload: dict, timeout: int) -> dict:
+    """Shared POST-with-one-retry helper for the API-calling functions above."""
     for attempt in range(2):
         try:
-            res = requests.post(
-                f"{API_BASE}/api/chat",
-                json={"query": query, "history": history or [], "top_k": top_k},
-                timeout=timeout,
-            )
+            res = requests.post(f"{API_BASE}{path}", json=payload, timeout=timeout)
             res.raise_for_status()
             return res.json()
         except requests.exceptions.ConnectionError:
